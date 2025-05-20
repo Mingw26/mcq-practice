@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ Practice Hub</title>
+    <style>
+        /* CSS for styling (like VBS formatting) */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e6f3e6; /* Light green background, like Kaoshichao */
+        }
+        nav {
+            background-color: #2196f3; /* Blue navigation bar */
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        section {
+            padding: 20px;
+            display: none; /* Hide all sections by default */
+        }
+        section.active {
+            display: block; /* Show the active section */
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            background-color: #2196f3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #1976d2;
+        }
+        form label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        form input {
+            width: 100%;
+            max-width: 400px;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        #options button {
+            display: block;
+            width: 200px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar (like a Python menu) -->
+    <nav>
+        <a href="#home" onclick="showSection('home')">Homepage</a>
+        <a href="#upload" onclick="showSection('upload')">Upload</a>
+        <a href="#practice" onclick="showSection('practice')">Practice</a>
+    </nav>
+
+    <!-- Homepage Section -->
+    <section id="home" class="active">
+        <h1>Welcome to MCQ Practice Hub</h1>
+        <p>Upload and practice multiple-choice questions for free!</p>
+        <p>
+            <button onclick="showSection('upload')">Upload MCQs</button>
+            <button onclick="showSection('practice')">Start Practicing</button>
+        </p>
+    </section>
+
+    <!-- Upload Section -->
+    <section id="upload">
+        <h1>Upload MCQs</h1>
+        <p>Enter your multiple-choice question below:</p>
+        <form id="uploadForm">
+            <label>Question:</label>
+            <input type="text" name="question" required>
+            <label>Option A:</label>
+            <input type="text" name="a" required>
+            <label>Option B:</label>
+            <input type="text" name="b" required>
+            <label>Option C:</label>
+            <input type="text" name="c" required>
+            <label>Option D:</label>
+            <input type="text" name="d" required>
+            <label>Correct Answer (A, B, C, or D):</label>
+            <input type="text" name="answer" required>
+            <button type="button" onclick="submitQuestion()">Submit</button>
+        </form>
+    </section>
+
+    <!-- Practice Section -->
+    <section id="practice">
+        <h1>Practice MCQs</h1>
+        <p>Practice your questions here. Select an option to see if you're correct.</p>
+        <div id="question"></div>
+        <div id="options"></div>
+        <button onclick="loadQuestion()">Next Question</button>
+    </section>
+
+    <!-- JavaScript for functionality (like Python logic) -->
+    <script>
+        // Array to store questions (like a Python list)
+        let questions = [];
+
+        // Show the selected section (like a Python function)
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Show the selected section
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Handle form submission (like Python input handling)
+        function submitQuestion() {
+            let form = document.getElementById('uploadForm');
+            let question = {
+                q: form.question.value,
+                options: [form.a.value, form.b.value, form.c.value, form.d.value],
+                answer: form.answer.value.toUpperCase()
+            };
+            // Add to questions array (like Python list.append)
+            questions.push(question);
+            // Save to localStorage (like saving to a file in Python)
+            localStorage.setItem('questions', JSON.stringify(questions));
+            alert('Question uploaded! Go to Practice to try it.');
+            form.reset(); // Clear the form
+        }
+
+        // Load a random question (like Python random.choice)
+        function loadQuestion() {
+            // Load questions from localStorage
+            let storedQuestions = localStorage.getItem('questions');
+            if (storedQuestions) {
+                questions = JSON.parse(storedQuestions);
+            }
+            if (questions.length === 0) {
+                document.getElementById('question').innerText = 'No questions available. Please upload some!';
+                document.getElementById('options').innerHTML = '';
+                return;
+            }
+            let q = questions[Math.floor(Math.random() * questions.length)];
+            document.getElementById('question').innerText = q.q;
+            document.getElementById('options').innerHTML = q.options.map((opt, index) => {
+                let letter = String.fromCharCode(65 + index); // A, B, C, D
+                return `<button onclick="check('${letter}', '${q.answer}')">${letter}: ${opt}</button>`;
+            }).join('');
+        }
+
+        // Check the answer (like Python if statement)
+        function check(selected, correct) {
+            let feedback = selected === correct ? 'Correct!' : 'Wrong! The correct answer was ' + correct;
+            alert(feedback);
+        }
+
+        // Load a question when the Practice section is opened
+        document.querySelector('a[href="#practice"]').addEventListener('click', loadQuestion);
+    </script>
+</body>
+</html>
